@@ -1,0 +1,79 @@
+name: "jenkins"
+services:
+  docker:
+    container_name: docker
+    image: docker:27.3-dind
+    privileged: true
+    restart: unless-stopped
+    hostname: "docker-main.example.ru"
+    extra_hosts:
+      - "docker-main.example.ru:172.10.0.4"
+      - "jenkins-main.example.ru:172.10.0.2"
+      - "maildev.example.ru:172.10.0.3"
+    networks:
+      net:
+        ipv4_address: 172.10.0.4
+    ports:
+      - 2376:2376
+      - 2375:2375
+    volumes:
+      - docker-tls-ca:/certs/ca
+      - docker-tls-client:/certs/client
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+
+  jenkins-main:
+    container_name: jenkins_main
+    image: jenkins/jenkins:2.504.1-lts-jdk17
+    privileged: true
+    restart: unless-stopped
+    hostname: "jenkins-main.example.ru"
+    depends_on:
+      - docker
+    extra_hosts:
+      - "docker-main.example.ru:172.10.0.4"
+      - "jenkins-main.example.ru:172.10.0.2"
+      - "maildev.example.ru:172.10.0.3"
+    networks:
+      net:
+        ipv4_address: 172.10.0.2
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - "config:/var/jenkins_home"
+      - "docker_certs:/certs/client"
+      - "docker-tls-client:/certs/client:ro"
+
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_HOST: tcp://docker-main.example.ru:2376
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_CERT_PATH: /certs/client
+
+  maildev:
+    container_name: maildev
+    image: maildev/maildev:2.1.0
+    hostname: "maildev.example.ru"
+    restart: unless-stopped
+    extra_hosts:
+      - "jenkins-main.example.ru:172.10.0.2"
+    networks:
+      net:
+        ipv4_address: 172.10.0.3
+    ports:
+      - 1080:1080 # maildev - web application 
+      - 1025:1025 # jenkins will use 'mail:1025' to send emails
+
+# ALL options(network + volume)
+networks:
+  net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.10.0.0/16"
+volumes:
+  config:
+  docker_certs:
+  docker-tls-ca:
+  docker-tls-client:
