@@ -1,0 +1,109 @@
+name: "jenkins"
+services:
+  # docker in docker container. to run jenkins jobs in containers
+  docker:
+    container_name: docker
+    image: docker:27.3-dind
+    privileged: true
+    restart: unless-stopped
+    hostname: "docker.jenkins.net"
+    extra_hosts:
+      - "docker.jenkins.net:172.10.0.10"
+      - "agent.jenkins.net:172.10.0.11"
+      - "jenkins.net:172.10.0.12"
+      - "maildev.jenkins.net:172.10.0.13"
+    networks:
+      net:
+        ipv4_address: 172.10.0.10
+    volumes:
+      - docker-tls-ca:/certs/ca # docker certificates
+      - docker-tls-client:/certs/client # client certificates
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+
+  # jenkins agent
+  agent:
+    container_name: agent
+    image: docker:27.3-cli
+    privileged: true
+    hostname: "agent.jenkins.net"
+    extra_hosts:
+      - "docker.jenkins.net:172.10.0.10"
+      - "agent.jenkins.net:172.10.0.11"
+      - "jenkins.net:172.10.0.12"
+      - "maildev.jenkins.net:172.10.0.13"
+    depends_on:
+      - docker
+    entrypoint:
+      - /bin/sh
+    networks:
+      net:
+        ipv4_address: 172.10.0.11
+    volumes:
+      - docker-tls-client:/certs/client:ro # client certificates
+    tty:
+      true
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_HOST: tcp://docker.jenkins.net:2376
+      DOCKER_TLS_VERIFY: "1"
+
+  # main jenkins server
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:2.504.1-lts-jdk17
+    privileged: true
+    restart: unless-stopped
+    hostname: "jenkins.net"
+    extra_hosts:
+      - "docker.jenkins.net:172.10.0.10"
+      - "agent.jenkins.net:172.10.0.11"
+      - "jenkins.net:172.10.0.12"
+      - "maildev.jenkins.net:172.10.0.13"
+    networks:
+      net:
+        ipv4_address: 172.10.0.12
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - config:/var/jenkins_home # jenkins configs
+      - docker-tls-client:/certs/client:ro # client certificates
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_HOST: tcp://docker.jenkins.net:2376
+      DOCKER_TLS_VERIFY: "1"
+
+  # dev mail server
+  maildev:
+    container_name: maildev
+    image: maildev/maildev:2.1.0
+    hostname: "maildev.jenkins.net"
+    extra_hosts:
+      - "docker.jenkins.net:172.10.0.10"
+      - "agent.jenkins.net:172.10.0.11"
+      - "jenkins.net:172.10.0.12"
+      - "maildev.jenkins.net:172.10.0.13"
+    restart: unless-stopped
+    networks:
+      net:
+        ipv4_address: 172.10.0.13
+    ports:
+      - 1080:1080 # maildev - web application 
+      - 1025:1025 # jenkins will use 'mail:1025' to send emails
+
+# ALL options(network + volume)
+networks:
+  net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.10.0.0/16"
+
+volumes:
+  config: # jenkins configs
+  docker-tls-ca: # docker certificates
+  docker-tls-client: # docker client certificates
+  
