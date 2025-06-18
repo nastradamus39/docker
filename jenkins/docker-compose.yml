@@ -69,6 +69,7 @@ services:
       - 50000:50000
     volumes:
       - config:/var/jenkins_home # jenkins configs
+      - ./plugins:/usr/share/jenkins/ref/plugins # jenkins configs
       - docker-tls-client:/certs/client:ro # client certificates
     environment:
       DOCKER_TLS_CERTDIR: /certs
@@ -104,6 +105,7 @@ networks:
 
 volumes:
   config: # jenkins configs
+  plugins: # jenkins plugins
   docker-tls-ca: # docker certificates
   docker-tls-client: # docker client certificates
   
