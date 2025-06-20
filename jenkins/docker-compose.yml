@@ -93,7 +93,7 @@ services:
       - "1080:1080" # maildev - web application
       - "1025:1025" # jenkins will use 'mail:1025' to send emails
 
-  # jfrog artifactory server
+  # artifactory.jenkins.net.  jfrog artifactory server
   artifactory:
     container_name: artifactory
     image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.63.12
