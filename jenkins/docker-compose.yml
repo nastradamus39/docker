@@ -1,12 +1,12 @@
 name: "jenkins"
 services:
-  # docker in docker container. to run jenkins jobs in containers
+  # docker.jenkins.net. docker in docker container. to run jenkins jobs in containers
   docker:
     container_name: docker
     image: docker:27.3-dind
+    hostname: "docker.jenkins.net"
     privileged: true
     restart: unless-stopped
-    hostname: "docker.jenkins.net"
     extra_hosts:
       - "docker.jenkins.net:172.10.0.10"
       - "agent.jenkins.net:172.10.0.11"
@@ -21,12 +21,12 @@ services:
     environment:
       DOCKER_TLS_CERTDIR: /certs
 
-  # jenkins agent
+  # agent.jenkins.net. jenkins agent
   agent:
     container_name: agent
     image: docker:27.3-cli
-    privileged: true
     hostname: "agent.jenkins.net"
+    privileged: true
     extra_hosts:
       - "docker.jenkins.net:172.10.0.10"
       - "agent.jenkins.net:172.10.0.11"
@@ -41,21 +41,19 @@ services:
         ipv4_address: 172.10.0.11
     volumes:
       - docker-tls-client:/certs/client:ro # client certificates
-    tty:
-      true
     environment:
       DOCKER_TLS_CERTDIR: /certs
       DOCKER_CERT_PATH: /certs/client
       DOCKER_HOST: tcp://docker.jenkins.net:2376
       DOCKER_TLS_VERIFY: "1"
 
-  # main jenkins server
+  # jenkins.net. main jenkins server
   jenkins:
     container_name: jenkins
     image: jenkins/jenkins:2.504.1-lts-jdk17
+    hostname: "jenkins.net"
     privileged: true
     restart: unless-stopped
-    hostname: "jenkins.net"
     extra_hosts:
       - "docker.jenkins.net:172.10.0.10"
       - "agent.jenkins.net:172.10.0.11"
@@ -65,11 +63,11 @@ services:
       net:
         ipv4_address: 172.10.0.12
     ports:
-      - 8080:8080
-      - 50000:50000
+      - "8080:8080"
+      - "50000:50000"
     volumes:
       - config:/var/jenkins_home # jenkins configs
-      - ./plugins:/usr/share/jenkins/ref/plugins # jenkins configs
+#      - ./plugins:/usr/share/jenkins/ref/plugins # jenkins configs
       - docker-tls-client:/certs/client:ro # client certificates
     environment:
       DOCKER_TLS_CERTDIR: /certs
@@ -92,8 +90,21 @@ services:
       net:
         ipv4_address: 172.10.0.13
     ports:
-      - 1080:1080 # maildev - web application 
-      - 1025:1025 # jenkins will use 'mail:1025' to send emails
+      - "1080:1080" # maildev - web application
+      - "1025:1025" # jenkins will use 'mail:1025' to send emails
+
+  # jfrog artifactory server
+  artifactory:
+    container_name: artifactory
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.63.12
+    hostname: "artifactory.jenkins.net"
+    restart: unless-stopped
+    networks:
+      net:
+        ipv4_address: 172.10.0.14
+    ports:
+      - "8081:8081"
+      - "8082:8082"
 
 # ALL options(network + volume)
 networks:
@@ -105,7 +116,7 @@ networks:
 
 volumes:
   config: # jenkins configs
-  plugins: # jenkins plugins
+#  plugins: # jenkins plugins
   docker-tls-ca: # docker certificates
   docker-tls-client: # docker client certificates
   
