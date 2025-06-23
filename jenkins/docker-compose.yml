@@ -21,12 +21,11 @@ services:
     environment:
       DOCKER_TLS_CERTDIR: /certs
 
-  # agent.jenkins.net. jenkins agent
-  agent:
-    container_name: agent
-    image: docker:27.3-cli
-    hostname: "agent.jenkins.net"
-    privileged: true
+  # jenkins.net. main jenkins server
+  jenkins:
+    container_name: jenkins
+    build: jenkins
+    hostname: "jenkins.net"
     extra_hosts:
       - "docker.jenkins.net:172.10.0.10"
       - "agent.jenkins.net:172.10.0.11"
@@ -34,31 +33,6 @@ services:
       - "maildev.jenkins.net:172.10.0.13"
     depends_on:
       - docker
-    entrypoint:
-      - /bin/sh
-    networks:
-      net:
-        ipv4_address: 172.10.0.11
-    volumes:
-      - docker-tls-client:/certs/client:ro # client certificates
-    environment:
-      DOCKER_TLS_CERTDIR: /certs
-      DOCKER_CERT_PATH: /certs/client
-      DOCKER_HOST: tcp://docker.jenkins.net:2376
-      DOCKER_TLS_VERIFY: "1"
-
-  # jenkins.net. main jenkins server
-  jenkins:
-    container_name: jenkins
-    image: jenkins/jenkins:2.504.1-lts-jdk17
-    hostname: "jenkins.net"
-    privileged: true
-    restart: unless-stopped
-    extra_hosts:
-      - "docker.jenkins.net:172.10.0.10"
-      - "agent.jenkins.net:172.10.0.11"
-      - "jenkins.net:172.10.0.12"
-      - "maildev.jenkins.net:172.10.0.13"
     networks:
       net:
         ipv4_address: 172.10.0.12
@@ -67,8 +41,35 @@ services:
       - "50000:50000"
     volumes:
       - config:/var/jenkins_home # jenkins configs
-#      - ./plugins:/usr/share/jenkins/ref/plugins # jenkins configs
       - docker-tls-client:/certs/client:ro # client certificates
+      - ssh-keys:/ssh_keys # ssh keys
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_HOST: tcp://docker.jenkins.net:2376
+      DOCKER_TLS_VERIFY: "1"
+
+  # agent.jenkins.net. jenkins agent
+  agent:
+    container_name: agent
+    build: agent
+    hostname: "agent.jenkins.net"
+    extra_hosts:
+      - "docker.jenkins.net:172.10.0.10"
+      - "agent.jenkins.net:172.10.0.11"
+      - "jenkins.net:172.10.0.12"
+      - "maildev.jenkins.net:172.10.0.13"
+    depends_on:
+      - jenkins
+    networks:
+      net:
+        ipv4_address: 172.10.0.11
+    volumes:
+      - docker-tls-client:/certs/client:ro # client certificates
+      - config:/var/jenkins_home # jenkins configs
+      - ssh-keys:/ssh_keys # jenkins configs
+    tty:
+      true
     environment:
       DOCKER_TLS_CERTDIR: /certs
       DOCKER_CERT_PATH: /certs/client
@@ -116,7 +117,7 @@ networks:
 
 volumes:
   config: # jenkins configs
-#  plugins: # jenkins plugins
   docker-tls-ca: # docker certificates
   docker-tls-client: # docker client certificates
+  ssh-keys: # agent ssh keys
   
