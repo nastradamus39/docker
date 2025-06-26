@@ -5,6 +5,7 @@ RUN jenkins-plugin-cli --plugins artifactory
 RUN jenkins-plugin-cli --plugins jfrog
 RUN jenkins-plugin-cli --plugins parameterized-trigger
 RUN jenkins-plugin-cli --plugins configuration-as-code:1971.vf9280461ea_89
+RUN jenkins-plugin-cli --plugins envinject
 
 COPY jenkins-cli.jar /usr/bin/jenkins-cli.jar
 COPY jenkins.yaml /var/jenkins_home/jenkins.yaml
