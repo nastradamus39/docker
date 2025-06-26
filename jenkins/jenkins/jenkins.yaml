@@ -64,7 +64,7 @@ jenkins:
           credentialsId: "ssh-agent"
           host: "agent.jenkins.net"
           port: 22
-          sshHostKeyVerificationStrategy: "knownHostsFileKeyVerificationStrategy"
+          sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
       name: "docker agent"
       remoteFS: "/webhome"
       retentionStrategy: "always"
