@@ -19,15 +19,15 @@ RUN echo \
 
 RUN apt-get -q --yes --force-yes update
 
-RUN apt-get -q --yes --force-yes install docker-ce-cli
-
-RUN apt-get -q --yes --force-yes install openssh-server
-
-RUN apt-get -q --yes --force-yes install openssh-client
-
-RUN apt-get -q --yes --force-yes install openjdk-17-jdk
+RUN apt-get -q --yes --force-yes install docker-ce-cli \
+    openssh-server \
+    openssh-client \
+    openjdk-17-jdk
 
 RUN ssh-keygen -f ~/.ssh/id_rsa -P ""
+
+RUN chmod 0700 ~/.ssh && \
+    touch ~/.ssh/authorized_keys
 
 COPY entry-point.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
