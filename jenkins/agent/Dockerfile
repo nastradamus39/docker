@@ -31,4 +31,4 @@ RUN chmod 0700 ~/.ssh && \
 
 COPY entry-point.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["sh" ,"/entrypoint.sh"]
