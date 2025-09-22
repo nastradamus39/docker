@@ -8,7 +8,7 @@ RUN jenkins-plugin-cli --plugins docker-plugin \
     artifactory \
     jfrog \
     parameterized-trigger \
-    configuration-as-code:1971.vf9280461ea_89 \
+    configuration-as-code \
     envinject \
     pipeline-stage-view
 
@@ -29,6 +29,6 @@ RUN chown jenkins /var/jenkins_home/jenkins.yaml && \
 
 COPY entry-point.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]
 
 USER jenkins
