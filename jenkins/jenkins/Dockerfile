@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.504.1-lts-jdk17
+FROM jenkins/jenkins:latest
 
 COPY jenkins-cli.jar /usr/bin/jenkins-cli.jar
 COPY jenkins.yaml /var/jenkins_home/jenkins.yaml
