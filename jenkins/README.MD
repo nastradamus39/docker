@@ -25,3 +25,31 @@
 docker exec agent bash -c 'cat /ssh_keys/jenkins.pub >> ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys'
 docker exec jenkins bash -c 'ssh-keyscan agent.jenkins.net >> ~/.ssh/known_hosts'
 ```
+
+2. В настройках добавляем приватный ключ
+
+настройки -> credentials -> ssh-agent
+
+```shell
+docker exec jenkins bash -c 'cat ~/.ssh/id_rsa'
+```
+
+3. Сертификаты для докера
+
+настройки -> credentials -> docker
+
+Client Key
+
+```shell
+docker exec jenkins bash -c 'cat /certs/client/key.pem'
+```
+Client Certificate
+
+```shell
+docker exec jenkins bash -c 'cat /certs/client/cert.pem'
+```
+
+Server CA Certificate 
+```shell
+docker exec jenkins bash -c 'cat /certs/client/ca.pem'
+```
