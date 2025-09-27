@@ -27,8 +27,4 @@ RUN mkdir $JENKINS_HOME/.ssh/ && \
 RUN chown jenkins /var/jenkins_home/jenkins.yaml && \
     chown jenkins /usr/bin/jenkins-cli.jar
 
-COPY entry-point.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["sh", "/entrypoint.sh"]
-
 USER jenkins

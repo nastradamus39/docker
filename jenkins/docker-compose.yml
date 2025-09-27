@@ -43,11 +43,13 @@ services:
       - config:/var/jenkins_home # jenkins configs
       - docker-tls-client:/certs/client:ro # client certificates
       - ssh-keys:/ssh_keys # ssh keys
+      - ./jenkins/entry-point.sh:/entry-point.sh
     environment:
       DOCKER_TLS_CERTDIR: /certs
       DOCKER_CERT_PATH: /certs/client
       DOCKER_HOST: tcp://docker.jenkins.net:2376
       DOCKER_TLS_VERIFY: "1"
+    entrypoint: [ "sh", "/entry-point.sh" ]
 
   # agent.jenkins.net. jenkins agent
   agent:
@@ -68,6 +70,7 @@ services:
       - docker-tls-client:/certs/client:ro # client certificates
       - config:/var/jenkins_home # jenkins configs
       - ssh-keys:/ssh_keys # jenkins configs
+      - ./agent/entry-point.sh:/entry-point.sh
     tty:
       true
     environment:
@@ -75,6 +78,8 @@ services:
       DOCKER_CERT_PATH: /certs/client
       DOCKER_HOST: tcp://docker.jenkins.net:2376
       DOCKER_TLS_VERIFY: "1"
+    entrypoint: [ "sh", "-c", "/entry-point.sh && exec \"$@\"" ]
+
 
   # dev mail server
   maildev:
