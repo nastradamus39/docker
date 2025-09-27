@@ -28,7 +28,3 @@ RUN ssh-keygen -f ~/.ssh/id_rsa -P ""
 
 RUN chmod 0700 ~/.ssh && \
     touch ~/.ssh/authorized_keys
-
-COPY entry-point.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["sh" ,"/entrypoint.sh"]

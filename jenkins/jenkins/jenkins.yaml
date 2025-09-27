@@ -38,6 +38,17 @@ jenkins:
     standard:
       excludeClientIPFromCrumb: false
   disableRememberMe: false
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "DOCKER_CERT_PATH"
+            value: "/certs/client"
+          - key: "DOCKER_HOST"
+            value: "tcp://docker.jenkins.net:2376"
+          - key: "DOCKER_TLS_CERTDIR"
+            value: "/certs"
+          - key: "DOCKER_TLS_VERIFY"
+            value: "1"
   labelAtoms:
   - name: "built-in"
   - name: "docker"
