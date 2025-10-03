@@ -20,6 +20,21 @@ credentials:
               privateKey: "{SSH_PRIVATE_KEY}"
           scope: GLOBAL
           username: "root"
+      - basicSSHUserPrivateKey:
+          description: "git ssh agent"
+          id: "github"
+          privateKeySource:
+            directEntry:
+              privateKey: "{SSH_PRIVATE_KEY}"
+          scope: GLOBAL
+          username: "root"
+      - usernamePassword:
+          description: "jfrog artifactory"
+          id: "jfrog"
+          password: "{PASSWORD}"
+          scope: GLOBAL
+          username: "admin"
+
 jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
@@ -138,6 +153,20 @@ security:
     forceSandbox: false
 unclassified:
   artifactoryBuilder:
+    jfrogInstances:
+      - artifactoryUrl: "http://localhost:8082/artifactory"
+        bypassProxy: false
+        connectionRetry: 3
+        deployerCredentialsConfig:
+          credentialsId: "jfrog"
+          overridingCredentials: false
+          password: "password"
+          username: "admin"
+        deploymentThreads: 3
+        distributionUrl: "http://localhost:8082/distribution"
+        instanceId: "jfrog"
+        platformUrl: "http://localhost:8082"
+        timeout: 300
     jfrogPipelinesServer:
       bypassProxy: false
       connectionRetries: 3
@@ -170,7 +199,7 @@ unclassified:
     storage: "file"
   location:
     adminAddress: "адрес еще не настроен <nobody@nowhere>"
-    url: "http://localhost:8080/"
+    url: "http://localhost"
   mailer:
     charset: "UTF-8"
     useSsl: false

@@ -22,7 +22,8 @@ RUN apt-get -q --yes --force-yes update
 RUN apt-get -q --yes --force-yes install docker-ce-cli \
     openssh-server \
     openssh-client \
-    openjdk-17-jdk
+    openjdk-17-jdk \
+    git
 
 RUN ssh-keygen -f ~/.ssh/id_rsa -P ""
 

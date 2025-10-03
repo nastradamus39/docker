@@ -20,18 +20,23 @@
 
 **После первого запуска**
 
-1. Ssh ключи для подключения jenkins-agent -> jenkins
+1. Меняем пароль jfrog artifactory
 ```shell
-docker exec agent bash -c 'cat /ssh_keys/jenkins.pub >> ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys'
-docker exec jenkins bash -c 'ssh-keyscan agent.jenkins.net >> ~/.ssh/known_hosts'
+default - admin/password
 ```
 
-2. В настройках добавляем приватный ключ
+1. Ssh ключи для подключения jenkins-agent -> jenkins
+```shell
+docker exec agent bash -c "cat /ssh_keys/jenkins.pub >> ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys"
+docker exec jenkins bash -c "ssh-keyscan agent.jenkins.net >> ~/.ssh/known_hosts"
+```
+
+2.  Credentials для агента
 
 настройки -> credentials -> ssh-agent
 
 ```shell
-docker exec jenkins bash -c 'cat ~/.ssh/id_rsa'
+docker exec jenkins bash -c "cat ~/.ssh/id_rsa"
 ```
 
 3. Сертификаты для докера
@@ -41,15 +46,21 @@ docker exec jenkins bash -c 'cat ~/.ssh/id_rsa'
 Client Key
 
 ```shell
-docker exec jenkins bash -c 'cat /certs/client/key.pem'
+docker exec jenkins bash -c "cat /certs/client/key.pem"
 ```
 Client Certificate
 
 ```shell
-docker exec jenkins bash -c 'cat /certs/client/cert.pem'
+docker exec jenkins bash -c "cat /certs/client/cert.pem"
 ```
 
 Server CA Certificate 
 ```shell
-docker exec jenkins bash -c 'cat /certs/client/ca.pem'
+docker exec jenkins bash -c "cat /certs/client/ca.pem"
 ```
+
+4. Credentials для frogs
+
+настройки -> credentials -> docker
+
+пароль из пункта 1

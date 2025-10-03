@@ -37,7 +37,7 @@ services:
       net:
         ipv4_address: 172.10.0.12
     ports:
-      - "8080:8080"
+      - "80:8080"
       - "50000:50000"
     volumes:
       - config:/var/jenkins_home # jenkins configs
@@ -125,4 +125,3 @@ volumes:
   docker-tls-ca: # docker certificates
   docker-tls-client: # docker client certificates
   ssh-keys: # agent ssh keys
-  
